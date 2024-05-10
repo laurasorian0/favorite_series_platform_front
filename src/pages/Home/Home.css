@@ -1,0 +1,49 @@
+.divSerie { 
+
+  width: 300px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.divSerie img {
+  width: 150px;
+  height: 200px;
+  object-fit: contain;
+}
+
+.divSerie > div { 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.divSeries { 
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.info {
+  height: 50px;
+}
+
+.divSerie > div > .like {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  transition: all 0.5s;
+}
+
+.divSerie > div > .like:hover {
+  transform: scale(1.1);
+
+}
