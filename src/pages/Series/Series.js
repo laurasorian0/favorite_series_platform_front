@@ -62,15 +62,27 @@ export const formularioSerie = (elementoPadre) => {
     try {
       const res = await fetch("http://localhost:3000/api/v1/series", opciones);
       if (res.ok) {
-        console.log("La serie se ha guardado correctamente en la base de datos.");
         actualizarYPintarSeries();
       } else {
-        console.error("Error al registrar la serie:", res.status, res.statusText);
+        mostrarError("Error al registrar la serie. Revisa todos los datos");
       }
     } catch (error) {
-      console.error("Error de red:", error);
+      mostrarError("Error de red al intentar registrar la serie.");
     }
   };
+
+  const mostrarError = (mensaje) => {
+    const erroresAnteriores = document.querySelectorAll(".error");
+    erroresAnteriores.forEach(error => error.remove());
+
+    const divError = document.createElement("div");
+    divError.classList.add("error");
+    divError.textContent = mensaje;
+
+    const main = document.querySelector("main");
+    main.appendChild(divError);
+  };
+
 
 
   const actualizarYPintarSeries = async () => {

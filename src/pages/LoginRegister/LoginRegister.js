@@ -104,8 +104,11 @@ const registerUser = async (userName, password) => {
 }
 
 const renderErrorMessage = (elementoPadre, errorMessage) => {
+  const existingErrorMessages = elementoPadre.querySelectorAll(".error");
+  existingErrorMessages.forEach(errorElement => errorElement.remove());
+
   const pError = document.createElement("p");
   pError.classList.add("error");
   pError.textContent = errorMessage;
   elementoPadre.append(pError);
-}
+};
