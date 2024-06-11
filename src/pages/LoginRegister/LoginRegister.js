@@ -1,6 +1,7 @@
-import "./LoginRegister.css"
+import "./LoginRegister.css";
 import { Header } from "../../components/Header/Header";
 import { Home } from "../Home/Home";
+import { fetchData } from "../../utils/api";
 
 export const LoginRegister = () => {
   const main = document.querySelector("main");
@@ -15,8 +16,8 @@ export const LoginRegister = () => {
 
 const renderLoginForm = (elementoPadre) => {
   const form = document.createElement("form");
-  const inputUN = document.createElement("input")
-  const inputPass = document.createElement("input")
+  const inputUN = document.createElement("input");
+  const inputPass = document.createElement("input");
   const buttonLogin = document.createElement("button");
   const buttonRegister = document.createElement("button");
 
@@ -43,65 +44,33 @@ const renderLoginForm = (elementoPadre) => {
     event.preventDefault();
     const userName = inputUN.value;
     const password = inputPass.value;
+    const user = { userName, password };
     registerUser(userName, password);
   });
-}
+};
 
 const loginUser = async (userName, password) => {
-  const objetoFinal = JSON.stringify({ userName, password });
-  const opciones = {
-    method: "POST",
-    body: objetoFinal,
-    headers: {
-      "Content-Type": "application/json"
-    }
-  };
-
   try {
-    const res = await fetch("http://localhost:3000/api/v1/users/login", opciones);
-    if (!res.ok) {
-      const errorMessage = await res.text();
-      if (res.status === 404) {
-        renderLoginForm(document.getElementById("login"));
-        renderErrorMessage(document.getElementById("login"), "El usuario no existe. ¿Desea registrarse?");
-      } else {
-        throw new Error("Usuario o contraseña incorrectos");
-      }
-    }
-
-    const respuestaFinal = await res.json();
-    localStorage.setItem("token", respuestaFinal.token);
-    localStorage.setItem("user", JSON.stringify(respuestaFinal.user));
+    const data = await fetchData("/users/login", "POST", { userName, password });
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
     Home();
     Header();
   } catch (error) {
     const loginDiv = document.getElementById("login");
     renderErrorMessage(loginDiv, error.message);
   }
-}
+};
 
 const registerUser = async (userName, password) => {
-  const objetoFinal = JSON.stringify({ userName, password });
-  const opciones = {
-    method: "POST",
-    body: objetoFinal,
-    headers: {
-      "Content-Type": "application/json"
-    }
-  };
-
   try {
-    const res = await fetch("http://localhost:3000/api/v1/users/register", opciones);
-    if (!res.ok) {
-      throw new Error("Error al registrar el usuario");
-    }
-
+    const data = await fetchData("/users/register", "POST", { userName, password });
     loginUser(userName, password);
   } catch (error) {
     const loginDiv = document.getElementById("login");
     renderErrorMessage(loginDiv, error.message);
   }
-}
+};
 
 const renderErrorMessage = (elementoPadre, errorMessage) => {
   const existingErrorMessages = elementoPadre.querySelectorAll(".error");
@@ -112,3 +81,4 @@ const renderErrorMessage = (elementoPadre, errorMessage) => {
   pError.textContent = errorMessage;
   elementoPadre.append(pError);
 };
+

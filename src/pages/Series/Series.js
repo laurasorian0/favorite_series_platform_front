@@ -1,3 +1,4 @@
+import { fetchGet, fetchPost } from "../../utils/api";
 import { pintarSeries } from "../Home/Home";
 import "./Series.css"
 
@@ -48,45 +49,21 @@ export const formularioSerie = (elementoPadre) => {
     const formData = new FormData();
     formData.append('titulo', titulo);
     formData.append('plataforma', plataforma);
-    formData.append('portada', portadaFile); // Añadir el archivo de la portada al FormData
+    formData.append('portada', portadaFile);
     formData.append('valoracion', valoracion);
 
-    console.log(portadaFile.name)
-
-    registrarSerie(titulo, plataforma, portadaFile, valoracion)
+    registrarSerie(formData);
   });
 
-  const registrarSerie = async (titulo, plataforma, portada, valoracion) => {
-    console.log("Enviando solicitud para registrar la serie...");
-    const formData = new FormData();
-    formData.append('titulo', titulo);
-    formData.append('plataforma', plataforma);
-    formData.append('portada', portada); // Aquí ya tienes el archivo de la portada, no es necesario acceder a portada.files[0]
-    formData.append('valoracion', valoracion);
-    const token = localStorage.getItem("token");
-
-    const opciones = {
-      method: "POST",
-      body: formData, // Usa FormData en lugar de objetoFinal
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    };
-
+  const registrarSerie = async (formData) => {
     try {
-      const res = await fetch("http://localhost:3000/api/v1/series", opciones);
-      const responseData = await res.json();
+      const responseData = await fetchPost("/series", formData);
       console.log(responseData);
-      if (res.ok) {
-        actualizarYPintarSeries();
-      } else {
-        mostrarError("Error al registrar la serie. Revisa todos los datos");
-      }
+      actualizarYPintarSeries();
     } catch (error) {
-      mostrarError("Error de red al intentar registrar la serie.");
+      mostrarError("Error al registrar la serie. Revisa todos los datos");
     }
   };
-
 
   const mostrarError = (mensaje) => {
     const erroresAnteriores = document.querySelectorAll(".error");
@@ -100,22 +77,16 @@ export const formularioSerie = (elementoPadre) => {
     main.appendChild(divError);
   };
 
-
-
   const actualizarYPintarSeries = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/v1/series");
-      if (res.ok) {
-        const series = await res.json();
-        const main = document.querySelector("main");
-        main.innerHTML = "";
-        pintarSeries(series, main);
-      } else {
-        console.error("Error al obtener la lista de series actualizada");
-      }
+      const series = await fetchGet("/series");
+      const main = document.querySelector("main");
+      main.innerHTML = "";
+      pintarSeries(series, main);
     } catch (error) {
-      console.error("Error de red:", error);
+      console.error("Error al obtener la lista de series actualizada", error);
     }
   };
 };
+
 

@@ -1,3 +1,4 @@
+import { fetchGet } from "../../utils/api";
 import { pintarSeries } from "../Home/Home";
 import "./Favoritos.css";
 
@@ -7,9 +8,10 @@ export const Favoritos = async () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const res = await fetch(`http://localhost:3000/api/v1/users/${user._id}`)
-
-  const usuario = await res.json();
-
-  pintarSeries(usuario.favoritos, main);
-}
+  try {
+    const usuario = await fetchGet(`/users/${user._id}`);
+    pintarSeries(usuario.favoritos, main);
+  } catch (error) {
+    console.error("Error al cargar los favoritos", error);
+  }
+};

@@ -1,3 +1,4 @@
+import { fetchGet, fetchPut } from "../../utils/api";
 import "./Home.css"
 
 let seriesCache = null;
@@ -10,15 +11,11 @@ export const Home = async () => {
     pintarSeries(seriesCache, main);
   } else {
     try {
-      const res = await fetch("http://localhost:3000/api/v1/series");
-      if (!res.ok) {
-        throw new Error("Error al cargar las series");
-      }
-      const series = await res.json();
+      const series = await fetchGet("/series");
       seriesCache = series;
       pintarSeries(series, main);
     } catch (error) {
-      console.error(error);
+      console.error("Error al cargar las series", error);
       main.innerHTML = "<p>Error al cargar las series. Por favor intentalo de nuevo.</p>";
     }
   }
@@ -47,7 +44,6 @@ export const pintarSeries = (series, elementoPadre) => {
     info.appendChild(titulo);
     info.appendChild(plataforma);
     divSerie.appendChild(info);
-
 
     if (user) {
       const like = document.createElement("img");
@@ -86,11 +82,9 @@ const addFavorito = async (idSerie) => {
 
     await updateFavoritos(user.favoritos);
 
-
     localStorage.setItem("user", JSON.stringify(user));
   }
 }
-
 
 const removeFavorito = async (idSerie) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -102,28 +96,14 @@ const removeFavorito = async (idSerie) => {
   localStorage.setItem("user", JSON.stringify(user));
 }
 
-
-
-
-
 const updateFavoritos = async (favoritos) => {
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const objetoFinal = JSON.stringify({
-    favoritos: favoritos
-  });
+  const objetoFinal = JSON.stringify({ favoritos });
 
-  const opciones = {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    },
-    body: objetoFinal
-  };
-
-  await fetch(`http://localhost:3000/api/v1/users/${user._id}`, opciones);
+  await fetchPut(`/users/${user._id}`, objetoFinal);
 }
+
 
 
 
