@@ -2,6 +2,7 @@ import { Favoritos } from "../../pages/Favoritos/Favoritos";
 import { Home } from "../../pages/Home/Home";
 import { LoginRegister } from "../../pages/LoginRegister/LoginRegister";
 import { Series } from "../../pages/Series/Series";
+import { PerfilUsuario } from "../PerfilUsuario/PerfilUsuario";
 import "./Header.css";
 
 
@@ -21,6 +22,10 @@ const routes = [
   {
     texto: "Login",
     funcion: LoginRegister
+  },
+  {
+    texto: "Perfil",
+    funcion: PerfilUsuario
   }
 ]
 
@@ -40,7 +45,7 @@ export const Header = () => {
         Header();
         Home();
       });
-    } else if (!localStorage.getItem("token") && (route.texto === "Añadir Serie" || route.texto === "Favoritos")) {
+    } else if (!localStorage.getItem("token") && (route.texto === "Añadir Serie" || route.texto === "Favoritos" || route.texto === "Perfil")) {
       continue;
     } else {
       a.textContent = route.texto;

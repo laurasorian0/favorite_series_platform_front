@@ -1,0 +1,30 @@
+.perfil-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+  height: 70vh;
+  width: 300px;
+  padding: 10px;
+  border-radius: 10px;
+  margin: auto;
+  background-color: rgb(111, 141, 131);
+  margin-top: 40px;
+
+}
+
+.perfil-form input {
+  border-radius: 20px;
+  padding: 10px;
+  border: 1px solid black;
+  cursor: pointer;
+  width: 180px;
+  padding: 3px 10px;
+  border: 1px solid #f6f6f6;
+  border-radius: 3px;
+  background-color: #f6f6f6;
+  margin: 8px 0;
+  display: inline-block;
+}
