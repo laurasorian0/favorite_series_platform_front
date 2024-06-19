@@ -1,5 +1,6 @@
-import { fetchGet, fetchPut } from "../../utils/api";
-import "./Home.css"
+import { detalleSerie } from "../../components/detalleSerie/detalleSerie";
+import { API_BASE_URL, fetchGet } from "../../utils/api";
+import "./Home.css";
 
 let seriesCache = null;
 
@@ -37,6 +38,7 @@ export const pintarSeries = (series, elementoPadre) => {
     divSerie.className = "divSerie";
     titulo.textContent = serie.titulo;
     portada.src = serie.portada;
+    portada.className = "portada";
     plataforma.textContent = serie.plataforma;
     info.className = "info";
 
@@ -44,6 +46,8 @@ export const pintarSeries = (series, elementoPadre) => {
     info.appendChild(titulo);
     info.appendChild(plataforma);
     divSerie.appendChild(info);
+
+    portada.addEventListener("click", () => detalleSerie(serie));
 
     if (user) {
       const like = document.createElement("img");
@@ -55,12 +59,13 @@ export const pintarSeries = (series, elementoPadre) => {
         like.src = "/assets/me-gusta.png";
       }
 
-      like.addEventListener("click", () => {
+      like.addEventListener("click", async (event) => {
+        event.stopPropagation();
         if (user.favoritos.includes(serie._id)) {
-          removeFavorito(serie._id);
+          await removeFavorito(serie._id);
           like.src = "/assets/corazon.png";
         } else {
-          addFavorito(serie._id);
+          await addFavorito(serie._id);
           like.src = "/assets/me-gusta.png";
         }
       });
@@ -76,36 +81,63 @@ export const pintarSeries = (series, elementoPadre) => {
 
 const addFavorito = async (idSerie) => {
   const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
 
   if (!user.favoritos.includes(idSerie)) {
     user.favoritos.push(idSerie);
 
-    await updateFavoritos(user.favoritos);
+    const body = { favoritos: user.favoritos };
 
-    localStorage.setItem("user", JSON.stringify(user));
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${user._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al realizar la solicitud: ${errorText}`);
+      }
+
+      localStorage.setItem("user", JSON.stringify(user));
+    } catch (error) {
+      console.error("Error al actualizar favoritos:", error);
+    }
   }
-}
+};
 
 const removeFavorito = async (idSerie) => {
   const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
 
-  user.favoritos = user.favoritos.filter(favorito => favorito !== idSerie);
+  user.favoritos = user.favoritos.filter((favorito) => favorito !== idSerie);
 
-  await updateFavoritos(user.favoritos);
+  const body = { favoritos: user.favoritos };
 
-  localStorage.setItem("user", JSON.stringify(user));
-}
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${user._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(body),
+    });
 
-const updateFavoritos = async (favoritos) => {
-  const user = JSON.parse(localStorage.getItem("user"));
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al realizar la solicitud: ${errorText}`);
+    }
 
-  const objetoFinal = JSON.stringify({ favoritos });
-
-  await fetchPut(`/users/${user._id}`, objetoFinal);
-}
-
-
-
-
+    localStorage.setItem("user", JSON.stringify(user));
+  } catch (error) {
+    console.error("Error al actualizar favoritos:", error);
+  }
+};
 
 

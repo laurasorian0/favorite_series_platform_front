@@ -1,6 +1,6 @@
-const API_BASE_URL = "http://localhost:3000/api/v1";
+export const API_BASE_URL = "http://localhost:3000/api/v1";
 
-export const fetchData = async (url, method, data) => {
+export const fetchData = async (url, method = "GET", data) => {
   const opciones = {
     method: method,
     headers: {
@@ -13,7 +13,7 @@ export const fetchData = async (url, method, data) => {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/api/v1${url}`, opciones);
+    const response = await fetch(`${API_BASE_URL}${url}`, opciones);
     if (!response.ok) {
       throw new Error("Error al realizar la solicitud");
     }
@@ -25,17 +25,7 @@ export const fetchData = async (url, method, data) => {
 
 
 export const fetchGet = async (endpoint) => fetchData(endpoint);
-export const fetchPost = async (endpoint, body) => fetchData(endpoint, {
-  method: "POST",
-  body: body instanceof FormData ? body : JSON.stringify(body),
-  headers: body instanceof FormData ? {} : {
-    "Content-Type": "application/json"
-  }
-});
-export const fetchPut = async (endpoint, body) => fetchData(endpoint, {
-  method: "PUT",
-  body: JSON.stringify(body),
-  headers: {
-    "Content-Type": "application/json"
-  }
-});
+export const fetchPost = async (endpoint, body) => fetchData(endpoint, "POST", body);
+export const fetchPut = async (endpoint, body) => fetchData(endpoint, "PUT", body);
+
+

@@ -14,6 +14,11 @@
   width: 150px;
   height: 200px;
   object-fit: contain;
+  cursor: pointer;
+}
+
+.divSerie img:hover {
+  scale: 1.1;
 }
 
 .divSerie > div { 
