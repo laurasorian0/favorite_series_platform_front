@@ -54,7 +54,7 @@ const modificarDatos = async (currentName, newName) => {
   const userId = obtenerIdUsuario();
 
   try {
-    // Obtener datos del usuario actual
+
     const usuarioActualResponse = await fetch(`http://localhost:3000/api/v1/users/${userId}`, {
       method: "GET",
       headers: {
@@ -73,10 +73,10 @@ const modificarDatos = async (currentName, newName) => {
       throw new Error("El nombre de usuario actual no coincide.");
     }
 
-    // Modificar datos del usuario, incluyendo favoritos
+
     const datosModificados = {
       userName: newName,
-      favoritos: usuarioActual.favoritos // Incluir favoritos actuales
+      favoritos: usuarioActual.favoritos
     };
     console.log("Datos modificados que se envían:", datosModificados);
 
@@ -90,7 +90,7 @@ const modificarDatos = async (currentName, newName) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text(); // Obtén el texto del error
+      const errorText = await response.text();
       throw new Error(`Error al modificar el nombre de usuario. ${errorText}`);
     }
 
