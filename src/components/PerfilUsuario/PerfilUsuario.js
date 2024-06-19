@@ -1,5 +1,4 @@
 import { Home } from "../../pages/Home/Home";
-import { fetchData } from "../../utils/api";
 import "./PerfilUsuario.css";
 
 export const PerfilUsuario = () => {
@@ -14,7 +13,6 @@ export const PerfilUsuario = () => {
 };
 
 export const renderPerfil = (elementoPadre) => {
-
   const userData = JSON.parse(localStorage.getItem("user"));
   const currentUserName = userData ? userData.userName : '';
 
@@ -28,7 +26,6 @@ export const renderPerfil = (elementoPadre) => {
   inputNewName.placeholder = "Nombre de usuario nuevo";
   inputCurrentName.disabled = true;
   buttonModificar.innerHTML = "Modificar nombre usuario";
-
 
   form.append(inputCurrentName);
   form.append(inputNewName);
@@ -54,48 +51,49 @@ export const renderPerfil = (elementoPadre) => {
 
 const modificarDatos = async (currentName, newName) => {
   const token = localStorage.getItem("token");
-  const userId = obtenerIdUsuario(); // Obtener el ID del usuario
-
-  // Obtener los datos del usuario actual
-  const usuarioActualResponse = await fetch(`http://localhost:3000/api/v1/users/${userId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`, // Incluir el token en el encabezado de autorización
-    }
-  });
-
-  if (!usuarioActualResponse.ok) {
-    console.error("Error al obtener los datos del usuario actual.");
-    return;
-  }
-
-  const usuarioActual = await usuarioActualResponse.json();
-
-  // Verificar si el nombre de usuario actual coincide
-  if (usuarioActual.userName !== currentName) {
-    console.error("El nombre de usuario actual no coincide.");
-    alert("El nombre de usuario actual no coincide.");
-    return;
-  }
-
-  const datosModificados = {
-    userName: newName
-  };
+  const userId = obtenerIdUsuario();
 
   try {
+    // Obtener datos del usuario actual
+    const usuarioActualResponse = await fetch(`http://localhost:3000/api/v1/users/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!usuarioActualResponse.ok) {
+      throw new Error("Error al obtener los datos del usuario actual.");
+    }
+
+    const usuarioActual = await usuarioActualResponse.json();
+
+    if (usuarioActual.userName !== currentName) {
+      throw new Error("El nombre de usuario actual no coincide.");
+    }
+
+    // Modificar datos del usuario, incluyendo favoritos
+    const datosModificados = {
+      userName: newName,
+      favoritos: usuarioActual.favoritos // Incluir favoritos actuales
+    };
+    console.log("Datos modificados que se envían:", datosModificados);
+
     const response = await fetch(`http://localhost:3000/api/v1/users/${userId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Incluir el token en el encabezado de autorización
+        "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify(datosModificados),
     });
 
     if (!response.ok) {
-      throw new Error("Error al modificar el nombre de usuario.");
+      const errorText = await response.text(); // Obtén el texto del error
+      throw new Error(`Error al modificar el nombre de usuario. ${errorText}`);
     }
+
     console.log("Nombre de usuario modificado con éxito");
     const main = document.querySelector("main");
     const pModificado = document.createElement("p");
@@ -107,7 +105,8 @@ const modificarDatos = async (currentName, newName) => {
     }, 2000);
 
   } catch (error) {
-    console.error(error);
+    console.error("Error al actualizar el perfil:", error.message);
+    alert(error.message);
   }
 };
 
