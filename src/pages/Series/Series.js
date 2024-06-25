@@ -57,11 +57,26 @@ export const formularioSerie = (elementoPadre) => {
 
   const registrarSerie = async (formData) => {
     try {
-      const responseData = await fetchPost("/series", formData);
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3000/api/v1/series", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error data:", errorData);
+        throw new Error("Error al registrar la serie: " + errorData.message);
+      }
+
+      const responseData = await response.json();
       console.log(responseData);
       actualizarYPintarSeries();
     } catch (error) {
-      mostrarError("Error al registrar la serie. Revisa todos los datos");
+      mostrarError("Error al hacer la petición para registrar la serie: " + error.message);
     }
   };
 
